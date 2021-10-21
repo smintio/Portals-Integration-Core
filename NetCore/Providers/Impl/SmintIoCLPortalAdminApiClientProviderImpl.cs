@@ -73,22 +73,9 @@ namespace SmintIo.Portals.Integration.Core.Providers.Impl
             _clportalAdminOpenApiClient = new CLPortalAdminOpenApiClient(_http);            
         }
 
-        public async Task AddOrRemoveEcbUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid)
-        {
-            await SetupClapicOpenApiClientAsync();
-
-            await _retryPolicy.ExecuteAsync(async () =>
-            {
-                // get a new access token in case it was refreshed
-                var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
-                _clportalAdminOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
-                await _clportalAdminOpenApiClient.AddOrRemoveEcbUserGroupUsersAsync(usersSpec, userGroupUuid);
-            });
-        }
-
         public async Task AddOrRemovePortalsBackendUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid)
         {
-            await SetupClapicOpenApiClientAsync();
+            await SetupPortalsAdminOpenApiClientAsync();
 
             await _retryPolicy.ExecuteAsync(async () =>
             {
@@ -101,7 +88,7 @@ namespace SmintIo.Portals.Integration.Core.Providers.Impl
 
         public async Task<AddOrRemovePortalsFrontendUserGroupUsersResult> AddOrRemovePortalsFrontendUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid, string portalUuid)
         {
-            await SetupClapicOpenApiClientAsync();
+            await SetupPortalsAdminOpenApiClientAsync();
 
             var result = await _retryPolicy.ExecuteAsync(async () =>
             {
@@ -114,7 +101,7 @@ namespace SmintIo.Portals.Integration.Core.Providers.Impl
             return result;
         }
 
-        private async Task SetupClapicOpenApiClientAsync()
+        private async Task SetupPortalsAdminOpenApiClientAsync()
         {
             var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync();
             var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();

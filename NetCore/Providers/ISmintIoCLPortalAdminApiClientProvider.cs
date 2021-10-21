@@ -26,8 +26,6 @@ namespace SmintIo.Portals.Integration.Core.Providers
 {
     internal interface ISmintIoCLPortalAdminApiClientProvider
     {
-        Task AddOrRemoveEcbUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid);
-        
         Task AddOrRemovePortalsBackendUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid);
 
         Task<AddOrRemovePortalsFrontendUserGroupUsersResult> AddOrRemovePortalsFrontendUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid, string portalUuid);
