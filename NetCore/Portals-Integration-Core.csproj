@@ -1,0 +1,107 @@
+﻿<Project>
+
+
+  <!-- Implicit top import -->
+  <!-- see: https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-use-project-sdk?view=vs-2019 -->
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>SmintIo.Portals.Integration.Core</RootNamespace>
+    <PackageId>SmintIo.Portals.Integration.Core</PackageId>
+    <Authors>Smint.io</Authors>
+    <Product>Smint.io</Product>
+    <Description>The Smint.io Portals Integration Core package provides a common codebase integrating Portals to other systems, written in .NET Core</Description>
+    <Copyright>(c) 2021 Smint.io</Copyright>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageProjectUrl>https://www.smint.io</PackageProjectUrl>
+    <Version>1.0.0</Version>
+    <Title>Smint.io Portals Integration Core Library</Title>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/smintio/Portals-Integration-Core</RepositoryUrl>
+  </PropertyGroup>
+
+
+  <PropertyGroup>
+    <VersionParts>$([System.Text.RegularExpressions.Regex]::Split($(Version), '\.'))</VersionParts>
+    <MajorVersion>$(VersionParts[0])</MajorVersion>
+    <MinorVersion>$(VersionParts[2])</MinorVersion>
+    <VersionPatchLevel>$(VersionParts[4])</VersionPatchLevel>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RepositoryRootPath>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))</RepositoryRootPath>
+    <DocFxRootPath>$([System.IO.Path]::Combine($(RepositoryRootPath), 'documentation'))</DocFxRootPath>
+    <DocFxSourcePath>$([System.IO.Path]::Combine($(DocFxRootPath), 'src'))</DocFxSourcePath>
+    <DocFxOutputPath>$([System.IO.Path]::Combine($(DocFxRootPath), 'html'))</DocFxOutputPath>
+
+    <DocFxApiDocuConfiguration>$([System.IO.Path]::Combine($(DocFxSourcePath), 'api', 'docfx.json'))</DocFxApiDocuConfiguration>
+    <DocFxApiDocuTargetOuput>$([System.IO.Path]::Combine($(DocFxOutputPath), 'api', 'v$(MajorVersion)'))</DocFxApiDocuTargetOuput>
+
+    <DocFxWebDocuConfiguration>$([System.IO.Path]::Combine($(DocFxRootPath), 'src', 'general', 'docfx.json'))</DocFxWebDocuConfiguration>
+    <DocFxWebDocuTargetOuput>$([System.IO.Path]::Combine($(DocFxOutputPath), 'general'))</DocFxWebDocuTargetOuput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="5.0.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="IdentityModel.OidcClient" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.1" />
+    <PackageReference Include="Polly" Version="7.2.0" />
+    <PackageReference Include="RestSharp" Version="106.10.1" />
+    <PackageReference Include="SmintIo.CLPortal.Admin.Client" Version="1.0.0" />
+	<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.4.43" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Integration-Core.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Configuration\" />
+  </ItemGroup>
+
+  <!-- Implicit bottom import -->
+  <!-- see: https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-use-project-sdk?view=vs-2019 -->
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Target Name="BuildDocsAPI">
+    <Exec Command="docfx metadata $(DocFxApiDocuConfiguration)" />
+    <Exec Command="docfx build $(DocFxApiDocuConfiguration) -o'$(DocFxApiDocuTargetOuput)'" />
+  </Target>
+
+
+  <Target Name="BuildDocsGeneral">
+    <Exec Command="docfx build $(DocFxWebDocuConfiguration) -o'$(DocFxWebDocuTargetOuput)'" />
+  </Target>
+
+
+  <Target Name="BuildDocs">
+    <CallTarget Targets="BuildDocsGeneral" />
+    <CallTarget Targets="BuildDocsAPI" />
+  </Target>
+
+  <!-- once documentation is properly styled and working, you might add activate this one
+  <Target Name="AfterBuild">
+    <CallTarget Targets="BuildDocs" />
+  </Target>
+  -->
+
+  <Target Name="Coverage"></Target>
+
+</Project>
