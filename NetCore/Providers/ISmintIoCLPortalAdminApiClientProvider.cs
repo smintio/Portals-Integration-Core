@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace SmintIo.Portals.Integration.Core.Providers
 {
-    internal interface ISmintIoCLPortalAdminApiClientProvider
+    public interface ISmintIoCLPortalAdminApiClientProvider
     {
         Task AddOrRemovePortalsBackendUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid);
 
