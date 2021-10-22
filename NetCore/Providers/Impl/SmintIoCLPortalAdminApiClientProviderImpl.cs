@@ -122,7 +122,7 @@ namespace SmintIo.Portals.Integration.Core.Providers.Impl
             var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync();
             var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
 
-            _clportalAdminOpenApiClient.BaseUrl = $"https://{smintIoSettingsDatabaseModel.TenantId}.smint.io/portal/v1";
+            _clportalAdminOpenApiClient.BaseUrl = $"https://{smintIoSettingsDatabaseModel.TenantId}.portal-api.smint.io/portal/v1";
             _clportalAdminOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
         }
 
