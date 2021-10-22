@@ -19,18 +19,14 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using SmintIo.CLPortal.Admin.Client.Generated;
+using SmintIo.PortalsAPI.Backend.Client.Generated;
 using System;
 using System.Threading.Tasks;
 
 namespace SmintIo.Portals.Integration.Core.Providers
 {
-    public interface ISmintIoCLPortalAdminApiClientProvider
+    public interface ISmintIoPortalsBackendApiClientProvider
     {
-        Task AddOrRemovePortalsBackendUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid);
-
-        Task<AddOrRemovePortalsFrontendUserGroupUsersResult> AddOrRemovePortalsFrontendUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid, string portalUuid);
-
-        Task<TOut> ExecuteWithRetryPolicyAsync<TOut>(Func<CLPortalAdminOpenApiClient, Task<TOut>> funcAsync);
+        Task<TOut> ExecuteWithRetryPolicyAsync<TOut>(Func<PortalsAPIBOpenApiClient, Task<TOut>> funcAsync);
     }
 }

@@ -28,11 +28,11 @@ using System.Threading.Tasks;
 using System.Net;
 using SmintIo.Portals.Integration.Core.Authenticator;
 using SmintIo.Portals.Integration.Core.Database;
-using SmintIo.CLPortal.Admin.Client.Generated;
+using SmintIo.PortalsAPI.Frontend.Client.Generated;
 
 namespace SmintIo.Portals.Integration.Core.Providers.Impl
 {
-    internal class SmintIoCLPortalAdminApiClientProviderImpl: IDisposable, ISmintIoCLPortalAdminApiClientProvider
+    internal class SmintIoPortalsFrontendApiClientProviderImpl : IDisposable, ISmintIoPortalsFrontendApiClientProvider
     {
         private const int MaxRetryAttempts = 5;
 
@@ -49,9 +49,9 @@ namespace SmintIo.Portals.Integration.Core.Providers.Impl
 
         private readonly ILogger _logger;
 
-        private readonly CLPortalAdminOpenApiClient _clportalAdminOpenApiClient;
+        private readonly PortalsAPIFEOpenApiClient _portalsApiFEOpenApiClient;
 
-        public SmintIoCLPortalAdminApiClientProviderImpl(
+        public SmintIoPortalsFrontendApiClientProviderImpl(
             ISmintIoSettingsDatabaseProvider smintIoSettingsDatabaseProvider,
             ISmintIoTokenDatabaseProvider smintIoTokenDatabaseProvider,
             ILogger<SmintIoCLPortalAdminApiClientProviderImpl> logger,
@@ -70,23 +70,10 @@ namespace SmintIo.Portals.Integration.Core.Providers.Impl
 
             _retryPolicy = GetRetryStrategy();
 
-            _clportalAdminOpenApiClient = new CLPortalAdminOpenApiClient(_http);            
+            _portalsApiFEOpenApiClient = new PortalsAPIFEOpenApiClient(_http);            
         }
 
-        public async Task AddOrRemovePortalsBackendUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid)
-        {
-            await SetupPortalsAdminOpenApiClientAsync();
-
-            await _retryPolicy.ExecuteAsync(async () =>
-            {
-                // get a new access token in case it was refreshed
-                var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
-                _clportalAdminOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
-                await _clportalAdminOpenApiClient.AddOrRemovePortalsBackendUserGroupUsersAsync(usersSpec, userGroupUuid);
-            });
-        }
-
-        public async Task<AddOrRemovePortalsFrontendUserGroupUsersResult> AddOrRemovePortalsFrontendUserGroupUsersAsync(UsersSpec usersSpec, string userGroupUuid, string portalUuid)
+        public async Task<TOut> ExecuteWithRetryPolicyAsync<TOut>(Func<PortalsAPIFEOpenApiClient, Task<TOut>> funcAsync)
         {
             await SetupPortalsAdminOpenApiClientAsync();
 
@@ -94,24 +81,9 @@ namespace SmintIo.Portals.Integration.Core.Providers.Impl
             {
                 // get a new access token in case it was refreshed
                 var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
-                _clportalAdminOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
-                return await _clportalAdminOpenApiClient.AddOrRemovePortalsFrontendUserGroupUsersAsync(usersSpec, userGroupUuid, portalUuid);
-            });
+                _portalsApiFEOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
 
-            return result;
-        }
-
-        public async Task<TOut> ExecuteWithRetryPolicyAsync<TOut>(Func<CLPortalAdminOpenApiClient, Task<TOut>> funcAsync)
-        {
-            await SetupPortalsAdminOpenApiClientAsync();
-
-            var result = await _retryPolicy.ExecuteAsync(async () =>
-            {
-                // get a new access token in case it was refreshed
-                var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
-                _clportalAdminOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
-
-                return await funcAsync(_clportalAdminOpenApiClient).ConfigureAwait(false);
+                return await funcAsync(_portalsApiFEOpenApiClient).ConfigureAwait(false);
             });
 
             return result;
@@ -122,8 +94,8 @@ namespace SmintIo.Portals.Integration.Core.Providers.Impl
             var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync();
             var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
 
-            _clportalAdminOpenApiClient.BaseUrl = $"https://{smintIoSettingsDatabaseModel.TenantId}.smint.io/portal/v1";
-            _clportalAdminOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
+            _portalsApiFEOpenApiClient.BaseUrl = $"https://{smintIoSettingsDatabaseModel.TenantId}.portalsapife.smint.io/frontend/v1";
+            _portalsApiFEOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
         }
 
         private AsyncRetryPolicy GetRetryStrategy()

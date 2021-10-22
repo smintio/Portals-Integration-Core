@@ -41,7 +41,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton(smintIoSection.GetSection("App").Get<SmintIoAppOptions>());
             services.AddSingleton(smintIoSection.GetSection("Auth").Get<SmintIoAuthOptions>());
 
-            services.AddSingleton<ISmintIoCLPortalAdminApiClientProvider, SmintIoCLPortalAdminApiClientProviderImpl>();            
+            services.AddSingleton<ISmintIoCLPortalAdminApiClientProvider, SmintIoCLPortalAdminApiClientProviderImpl>();
+            services.AddSingleton<ISmintIoPortalsBackendApiClientProvider, SmintIoPortalsBackendApiClientProviderImpl>();
+            services.AddSingleton<ISmintIoPortalsFrontendApiClientProvider, SmintIoPortalsFrontendApiClientProviderImpl>();
 
             services.AddSingleton<ISmintIoAuthenticationRefresher, SmintIoAuthenticationRefresherImpl>();
             services.AddSingleton<ISmintIoAuthenticator, SmintIoSystemBrowserAuthenticatorImpl>();
